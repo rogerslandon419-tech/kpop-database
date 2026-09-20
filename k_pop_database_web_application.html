@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KProfiles - Indie & Custom K-Pop Database</title>
-    <!-- Tailwind CSS for clean white aesthetic and responsive design -->
+    <title>K-Pop Wiki Database</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styling matching clean white database aesthetic */
         body {
             background-color: #ffffff;
             color: #111111;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        .k-card {
+        .profile-card {
             border: 1px solid #e5e7eb;
             transition: all 0.2s ease;
         }
-        .k-card:hover {
+        .profile-card:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
     </style>
@@ -29,13 +27,13 @@
             <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
                 <span class="bg-black text-white font-black px-3 py-1 rounded tracking-wider text-xl">K</span>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight uppercase">K-Pop Database</h1>
+                    <h1 class="text-xl font-bold tracking-tight uppercase">K-Pop Wiki</h1>
                     <p class="text-xs text-gray-500">Official & Indie Profiles Directory</p>
                 </div>
             </div>
             
             <nav class="flex items-center gap-2 sm:gap-6 text-sm font-medium">
-                <button onclick="switchTab('home')" id="nav-home" class="px-3 py-2 rounded-md transition-colors bg-gray-100 text-black font-semibold">Home / Directory</button>
+                <button onclick="switchTab('home')" id="nav-home" class="px-3 py-2 rounded-md transition-colors bg-gray-100 text-black font-semibold">Directory</button>
                 <button onclick="switchTab('submit')" id="nav-submit" class="px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black">Submit Group</button>
                 <button onclick="switchTab('admin')" id="nav-admin" class="px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black flex items-center gap-1">
                     <span>Admin Dashboard</span>
@@ -47,12 +45,12 @@
 
     <main class="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
         
-        <!-- HOME / DIRECTORY TAB -->
+        <!-- DIRECTORY TAB -->
         <section id="tab-home" class="space-y-8">
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
-                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Explore K-Pop Profiles</h2>
-                    <p class="text-gray-600 mt-2 max-w-xl">Browse established and community-submitted independent groups, read member positions, birthdays, and nationalities.</p>
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">K-Pop Group Database</h2>
+                    <p class="text-gray-600 mt-2 max-w-xl">Browse established groups and community-submitted independent acts, explore member positions, birthdays, and details.</p>
                 </div>
                 <div class="w-full md:w-72">
                     <input type="text" id="search-input" oninput="filterGroups()" placeholder="Search groups or members..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black">
@@ -61,12 +59,12 @@
 
             <!-- Group Selector Tabs -->
             <div class="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200" id="group-tabs">
-                <!-- Dynamically populated group selection tabs -->
+                <!-- Populated via JavaScript -->
             </div>
 
-            <!-- Active Group Display Area -->
+            <!-- Group Display Area -->
             <div id="group-display-container" class="space-y-8">
-                <!-- Group Details & Members rendered via JS -->
+                <!-- Populated via JavaScript -->
             </div>
         </section>
 
@@ -74,7 +72,7 @@
         <section id="tab-submit" class="hidden max-w-2xl mx-auto space-y-6">
             <div class="border-b border-gray-200 pb-4">
                 <h2 class="text-2xl font-bold">Submit Your K-Pop Group</h2>
-                <p class="text-gray-600 text-sm mt-1">Fill out the details below to submit your group for review. Once approved by the administrator, it will appear in the main public directory.</p>
+                <p class="text-gray-600 text-sm mt-1">Fill out the details below to submit your group for review. Once approved by the administrator, it will appear in the public directory.</p>
             </div>
 
             <form id="submission-form" onsubmit="handleGroupSubmission(event)" class="space-y-6">
@@ -100,7 +98,7 @@
                         <button type="button" onclick="addMemberField()" class="text-xs bg-black text-white px-3 py-1.5 rounded-md hover:bg-gray-800">+ Add Member</button>
                     </div>
                     <div id="members-input-container" class="space-y-6">
-                        <!-- Dynamic member entry rows -->
+                        <!-- Populated via JavaScript -->
                     </div>
                 </div>
 
@@ -121,7 +119,7 @@
             </div>
 
             <div id="admin-pending-list" class="space-y-4">
-                <!-- Pending submissions will load here -->
+                <!-- Populated via JavaScript -->
             </div>
         </section>
 
@@ -129,12 +127,11 @@
 
     <footer class="border-t border-gray-200 mt-auto py-6 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4 text-center text-xs text-gray-500">
-            <p>KProfiles Database &copy; 2026. Clean white database aesthetic inspired by KProfiles.</p>
+            <p>K-Pop Wiki Database &copy; 2026. Clean white database aesthetic inspired by KProfiles.</p>
         </div>
     </footer>
 
     <script>
-        // Initial Seed Data (Default established groups including V0LT5)
         const defaultGroups = [
             {
                 id: "v0lt5",
@@ -167,12 +164,20 @@
                         photo: "https://placehold.co/200x250/f3f4f6/111111?text=Ren"
                     },
                     {
-                        stageName: "Kael (카엘)",
-                        realName: "Kael Santos",
-                        position: "Lead Vocalist, Maknae",
-                        birthday: "August 19, 2007",
-                        nationality: "Filipino-American",
-                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Kael"
+                        stageName: "Minho (민호)",
+                        realName: "Minho Choi",
+                        position: "Lead Vocalist, Lead Dancer",
+                        birthday: "September 8, 2005",
+                        nationality: "Korean",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Minho"
+                    },
+                    {
+                        stageName: "Taehyun (태현)",
+                        realName: "Taehyun Kim",
+                        position: "Main Vocalist, Maknae",
+                        birthday: "February 12, 2007",
+                        nationality: "Korean",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Taehyun"
                     }
                 ]
             },
@@ -210,23 +215,19 @@
             }
         ];
 
-        // State Management with LocalStorage persistence
         let groups = JSON.parse(localStorage.getItem('kpop_groups')) || defaultGroups;
         let pendingSubmissions = JSON.parse(localStorage.getItem('kpop_pending')) || [];
         let activeGroupId = groups[0]?.id || 'v0lt5';
         let searchQuery = '';
 
-        // Initialize App on Load
         window.onload = function() {
             renderGroupTabs();
             renderActiveGroup();
             renderAdminDashboard();
             updatePendingBadge();
-            // Add initial member row on submit page
             addMemberField();
         };
 
-        // Tab Navigation Switcher
         function switchTab(tabName) {
             document.getElementById('tab-home').classList.add('hidden');
             document.getElementById('tab-submit').classList.add('hidden');
@@ -244,7 +245,6 @@
             }
         }
 
-        // Render Group Tabs selector on Home Page
         function renderGroupTabs() {
             const container = document.getElementById('group-tabs');
             container.innerHTML = '';
@@ -262,7 +262,6 @@
             });
         }
 
-        // Render Active Group Profile & Member Cards
         function renderActiveGroup() {
             const container = document.getElementById('group-display-container');
             const group = groups.find(g => g.id === activeGroupId);
@@ -288,13 +287,12 @@
             `;
 
             group.members.forEach(m => {
-                // Apply search filter if active
                 if (searchQuery && !m.stageName.toLowerCase().includes(searchQuery) && !m.realName.toLowerCase().includes(searchQuery) && !group.name.toLowerCase().includes(searchQuery)) {
                     return;
                 }
 
                 html += `
-                    <div class="k-card bg-white rounded-lg p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">
+                    <div class="profile-card bg-white rounded-lg p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">
                         <img src="${m.photo || 'https://placehold.co/200x250/f3f4f6/111111?text=No+Photo'}" alt="${m.stageName}" class="w-36 h-44 object-cover rounded-md border border-gray-200 bg-gray-100 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f3f4f6/111111?text=Photo'">
                         <div class="space-y-2 w-full">
                             <h4 class="text-xl font-bold text-black border-b border-gray-100 pb-1">${m.stageName}</h4>
@@ -317,13 +315,11 @@
             container.innerHTML = html;
         }
 
-        // Search Filter trigger
         function filterGroups() {
             searchQuery = document.getElementById('search-input').value.toLowerCase();
             renderActiveGroup();
         }
 
-        // Add Member Row in Submission Form
         function addMemberField() {
             const container = document.getElementById('members-input-container');
             const index = container.children.length + 1;
@@ -347,7 +343,6 @@
             container.appendChild(div);
         }
 
-        // Handle Group Form Submission
         function handleGroupSubmission(e) {
             e.preventDefault();
 
@@ -380,7 +375,6 @@
             pendingSubmissions.push(newSubmission);
             localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
 
-            // Reset Form
             document.getElementById('submission-form').reset();
             document.getElementById('members-input-container').innerHTML = '';
             addMemberField();
@@ -390,7 +384,6 @@
             switchTab('home');
         }
 
-        // Render Admin Dashboard Pending Submissions
         function renderAdminDashboard() {
             const container = document.getElementById('admin-pending-list');
             
@@ -433,7 +426,6 @@
             });
         }
 
-        // Approve Submission
         function approveSubmission(index) {
             const approvedGroup = pendingSubmissions.splice(index, 1)[0];
             groups.push(approvedGroup);
@@ -449,7 +441,6 @@
             alertCustom(`"${approvedGroup.name}" has been approved and published to the public database!`);
         }
 
-        // Reject Submission
         function rejectSubmission(index) {
             pendingSubmissions.splice(index, 1);
             localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
@@ -458,7 +449,6 @@
             alertCustom("Submission rejected.");
         }
 
-        // Update Pending Badge Count
         function updatePendingBadge() {
             const badge = document.getElementById('pending-badge');
             if (pendingSubmissions.length > 0) {
@@ -469,7 +459,6 @@
             }
         }
 
-        // Reset database to default seed state
         function resetToDefaults() {
             if (confirm("Are you sure you want to reset all groups back to default?")) {
                 groups = defaultGroups;
@@ -485,7 +474,6 @@
             }
         }
 
-        // Custom Modal replacement for alert()
         function alertCustom(message) {
             const modal = document.createElement('div');
             modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4";
