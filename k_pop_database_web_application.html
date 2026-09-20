@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KProfiles - Indie & Custom K-Pop Database</title>
+    <!-- Tailwind CSS for clean white aesthetic and responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styling matching clean white database aesthetic */
+        body {
+            background-color: #ffffff;
+            color: #111111;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .k-card {
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        .k-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="border-b border-gray-200 sticky top-0 bg-white/95 backdrop-blur z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+                <span class="bg-black text-white font-black px-3 py-1 rounded tracking-wider text-xl">K</span>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight uppercase">K-Pop Database</h1>
+                    <p class="text-xs text-gray-500">Official & Indie Profiles Directory</p>
+                </div>
+            </div>
+            
+            <nav class="flex items-center gap-2 sm:gap-6 text-sm font-medium">
+                <button onclick="switchTab('home')" id="nav-home" class="px-3 py-2 rounded-md transition-colors bg-gray-100 text-black font-semibold">Home / Directory</button>
+                <button onclick="switchTab('submit')" id="nav-submit" class="px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black">Submit Group</button>
+                <button onclick="switchTab('admin')" id="nav-admin" class="px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black flex items-center gap-1">
+                    <span>Admin Dashboard</span>
+                    <span id="pending-badge" class="bg-pink-600 text-white text-xs px-1.5 py-0.2 rounded-full hidden">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
+        
+        <!-- HOME / DIRECTORY TAB -->
+        <section id="tab-home" class="space-y-8">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Explore K-Pop Profiles</h2>
+                    <p class="text-gray-600 mt-2 max-w-xl">Browse established and community-submitted independent groups, read member positions, birthdays, and nationalities.</p>
+                </div>
+                <div class="w-full md:w-72">
+                    <input type="text" id="search-input" oninput="filterGroups()" placeholder="Search groups or members..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+            </div>
+
+            <!-- Group Selector Tabs -->
+            <div class="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200" id="group-tabs">
+                <!-- Dynamically populated group selection tabs -->
+            </div>
+
+            <!-- Active Group Display Area -->
+            <div id="group-display-container" class="space-y-8">
+                <!-- Group Details & Members rendered via JS -->
+            </div>
+        </section>
+
+        <!-- SUBMIT GROUP TAB -->
+        <section id="tab-submit" class="hidden max-w-2xl mx-auto space-y-6">
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-2xl font-bold">Submit Your K-Pop Group</h2>
+                <p class="text-gray-600 text-sm mt-1">Fill out the details below to submit your group for review. Once approved by the administrator, it will appear in the main public directory.</p>
+            </div>
+
+            <form id="submission-form" onsubmit="handleGroupSubmission(event)" class="space-y-6">
+                <div class="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-lg border-b border-gray-200 pb-2">Group Information</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Group Name *</label>
+                        <input type="text" id="sub-group-name" required placeholder="e.g. V0LT5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Agency / Company (Optional)</label>
+                        <input type="text" id="sub-group-agency" placeholder="e.g. Independent / Self-Produced" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Debut Date</label>
+                        <input type="text" id="sub-group-debut" placeholder="e.g. June 15, 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                </div>
+
+                <div class="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <h3 class="font-semibold text-lg">Member Profiles</h3>
+                        <button type="button" onclick="addMemberField()" class="text-xs bg-black text-white px-3 py-1.5 rounded-md hover:bg-gray-800">+ Add Member</button>
+                    </div>
+                    <div id="members-input-container" class="space-y-6">
+                        <!-- Dynamic member entry rows -->
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-black text-white font-medium py-3 rounded-md hover:bg-gray-800 transition-colors">Submit Group for Review</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ADMIN DASHBOARD TAB -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <div class="border-b border-gray-200 pb-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold">Admin Approval Dashboard</h2>
+                    <p class="text-gray-600 text-sm mt-1">Review user submissions before publishing them to the public database.</p>
+                </div>
+                <button onclick="resetToDefaults()" class="text-xs border border-red-300 text-red-600 px-3 py-1.5 rounded hover:bg-red-50">Reset Database to Default</button>
+            </div>
+
+            <div id="admin-pending-list" class="space-y-4">
+                <!-- Pending submissions will load here -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-gray-200 mt-auto py-6 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-gray-500">
+            <p>KProfiles Database &copy; 2026. Clean white database aesthetic inspired by KProfiles.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initial Seed Data (Default established groups including V0LT5)
+        const defaultGroups = [
+            {
+                id: "v0lt5",
+                name: "V0LT5",
+                agency: "Independent",
+                debut: "2026",
+                members: [
+                    {
+                        stageName: "Jinwoo (진우)",
+                        realName: "Jinwoo Park",
+                        position: "Leader, Lead Vocalist",
+                        birthday: "January 14, 2004",
+                        nationality: "Korean",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Jinwoo"
+                    },
+                    {
+                        stageName: "Haru (하루)",
+                        realName: "Haru Lee",
+                        position: "Main Dancer, Sub-Vocalist",
+                        birthday: "May 22, 2005",
+                        nationality: "Korean",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Haru"
+                    },
+                    {
+                        stageName: "Ren (렌)",
+                        realName: "Ren Takahashi",
+                        position: "Main Rapper, Visual",
+                        birthday: "November 3, 2004",
+                        nationality: "Japanese",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Ren"
+                    },
+                    {
+                        stageName: "Kael (카엘)",
+                        realName: "Kael Santos",
+                        position: "Lead Vocalist, Maknae",
+                        birthday: "August 19, 2007",
+                        nationality: "Filipino-American",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Kael"
+                    }
+                ]
+            },
+            {
+                id: "straykids",
+                name: "Stray Kids",
+                agency: "JYP Entertainment",
+                debut: "March 25, 2018",
+                members: [
+                    {
+                        stageName: "Bang Chan (방찬)",
+                        realName: "Christopher Bang",
+                        position: "Leader, Producer, Lead Vocalist",
+                        birthday: "October 3, 1997",
+                        nationality: "Australian",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Bang+Chan"
+                    },
+                    {
+                        stageName: "Hyunjin (현진)",
+                        realName: "Hwang Hyun-jin",
+                        position: "Main Dancer, Lead Rapper, Visual",
+                        birthday: "March 20, 2000",
+                        nationality: "Korean",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Hyunjin"
+                    },
+                    {
+                        stageName: "Felix (필릭스)",
+                        realName: "Lee Felix / Lee Yong-bok",
+                        position: "Lead Dancer, Lead Rapper",
+                        birthday: "September 15, 2000",
+                        nationality: "Australian-Korean",
+                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Felix"
+                    }
+                ]
+            }
+        ];
+
+        // State Management with LocalStorage persistence
+        let groups = JSON.parse(localStorage.getItem('kpop_groups')) || defaultGroups;
+        let pendingSubmissions = JSON.parse(localStorage.getItem('kpop_pending')) || [];
+        let activeGroupId = groups[0]?.id || 'v0lt5';
+        let searchQuery = '';
+
+        // Initialize App on Load
+        window.onload = function() {
+            renderGroupTabs();
+            renderActiveGroup();
+            renderAdminDashboard();
+            updatePendingBadge();
+            // Add initial member row on submit page
+            addMemberField();
+        };
+
+        // Tab Navigation Switcher
+        function switchTab(tabName) {
+            document.getElementById('tab-home').classList.add('hidden');
+            document.getElementById('tab-submit').classList.add('hidden');
+            document.getElementById('tab-admin').classList.add('hidden');
+
+            document.getElementById('nav-home').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black";
+            document.getElementById('nav-submit').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black";
+            document.getElementById('nav-admin').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black flex items-center gap-1";
+
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            document.getElementById('nav-' + tabName).className = "px-3 py-2 rounded-md transition-colors bg-gray-100 text-black font-semibold flex items-center gap-1";
+
+            if(tabName === 'admin') {
+                renderAdminDashboard();
+            }
+        }
+
+        // Render Group Tabs selector on Home Page
+        function renderGroupTabs() {
+            const container = document.getElementById('group-tabs');
+            container.innerHTML = '';
+
+            groups.forEach(g => {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${g.id === activeGroupId ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`;
+                btn.innerText = g.name;
+                btn.onclick = () => {
+                    activeGroupId = g.id;
+                    renderGroupTabs();
+                    renderActiveGroup();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Render Active Group Profile & Member Cards
+        function renderActiveGroup() {
+            const container = document.getElementById('group-display-container');
+            const group = groups.find(g => g.id === activeGroupId);
+
+            if (!group) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-12">No group selected.</p>';
+                return;
+            }
+
+            let html = `
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-6">
+                        <div>
+                            <h3 class="text-3xl font-black uppercase tracking-wide">${group.name} Profile</h3>
+                            <p class="text-sm text-gray-600 mt-1">Agency: <span class="font-medium text-black">${group.agency || 'Independent'}</span> | Debut: <span class="font-medium text-black">${group.debut || 'N/A'}</span></p>
+                        </div>
+                        <div class="text-xs bg-gray-200 text-gray-800 px-3 py-1 rounded font-medium">
+                            ${group.members.length} Members
+                        </div>
+                    </div>
+
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            `;
+
+            group.members.forEach(m => {
+                // Apply search filter if active
+                if (searchQuery && !m.stageName.toLowerCase().includes(searchQuery) && !m.realName.toLowerCase().includes(searchQuery) && !group.name.toLowerCase().includes(searchQuery)) {
+                    return;
+                }
+
+                html += `
+                    <div class="k-card bg-white rounded-lg p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">
+                        <img src="${m.photo || 'https://placehold.co/200x250/f3f4f6/111111?text=No+Photo'}" alt="${m.stageName}" class="w-36 h-44 object-cover rounded-md border border-gray-200 bg-gray-100 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f3f4f6/111111?text=Photo'">
+                        <div class="space-y-2 w-full">
+                            <h4 class="text-xl font-bold text-black border-b border-gray-100 pb-1">${m.stageName}</h4>
+                            <ul class="text-xs space-y-1.5 text-gray-700">
+                                <li><strong class="text-black">Real Name:</strong> ${m.realName}</li>
+                                <li><strong class="text-black">Position:</strong> ${m.position}</li>
+                                <li><strong class="text-black">Birthday:</strong> ${m.birthday}</li>
+                                <li><strong class="text-black">Nationality:</strong> ${m.nationality}</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Search Filter trigger
+        function filterGroups() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase();
+            renderActiveGroup();
+        }
+
+        // Add Member Row in Submission Form
+        function addMemberField() {
+            const container = document.getElementById('members-input-container');
+            const index = container.children.length + 1;
+
+            const div = document.createElement('div');
+            div.className = "member-row bg-white p-4 rounded-md border border-gray-200 space-y-3 relative";
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-500 uppercase">Member #${index}</span>
+                    ${index > 1 ? '<button type="button" onclick="this.closest(\'.member-row\').remove()" class="text-xs text-red-600 hover:underline">Remove</button>' : ''}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Stage Name (e.g. Haru)" class="member-stage px-3 py-1.5 border border-gray-300 rounded text-sm" required>
+                    <input type="text" placeholder="Real Name (e.g. Haru Lee)" class="member-real px-3 py-1.5 border border-gray-300 rounded text-sm" required>
+                    <input type="text" placeholder="Position (e.g. Main Dancer)" class="member-pos px-3 py-1.5 border border-gray-300 rounded text-sm" required>
+                    <input type="text" placeholder="Birthday (e.g. Jan 1, 2005)" class="member-bday px-3 py-1.5 border border-gray-300 rounded text-sm" required>
+                    <input type="text" placeholder="Nationality (e.g. Korean)" class="member-nat px-3 py-1.5 border border-gray-300 rounded text-sm" required>
+                    <input type="url" placeholder="Photo URL (optional)" class="member-photo px-3 py-1.5 border border-gray-300 rounded text-sm">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        // Handle Group Form Submission
+        function handleGroupSubmission(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('sub-group-name').value.trim();
+            const agency = document.getElementById('sub-group-agency').value.trim();
+            const debut = document.getElementById('sub-group-debut').value.trim();
+
+            const memberRows = document.querySelectorAll('.member-row');
+            const members = [];
+
+            memberRows.forEach(row => {
+                members.push({
+                    stageName: row.querySelector('.member-stage').value.trim(),
+                    realName: row.querySelector('.member-real').value.trim(),
+                    position: row.querySelector('.member-pos').value.trim(),
+                    birthday: row.querySelector('.member-bday').value.trim(),
+                    nationality: row.querySelector('.member-nat').value.trim(),
+                    photo: row.querySelector('.member-photo').value.trim() || 'https://placehold.co/200x250/f3f4f6/111111?text=Member'
+                });
+            });
+
+            const newSubmission = {
+                id: 'sub_' + Date.now(),
+                name,
+                agency,
+                debut,
+                members
+            };
+
+            pendingSubmissions.push(newSubmission);
+            localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+
+            // Reset Form
+            document.getElementById('submission-form').reset();
+            document.getElementById('members-input-container').innerHTML = '';
+            addMemberField();
+
+            updatePendingBadge();
+            alertCustom("Group submitted successfully! The owner will review your submission in the Admin Dashboard.");
+            switchTab('home');
+        }
+
+        // Render Admin Dashboard Pending Submissions
+        function renderAdminDashboard() {
+            const container = document.getElementById('admin-pending-list');
+            
+            if (pendingSubmissions.length === 0) {
+                container.innerHTML = '<div class="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center text-gray-500">No pending group submissions to review.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            pendingSubmissions.forEach((sub, idx) => {
+                let card = document.createElement('div');
+                card.className = "bg-white border border-gray-200 rounded-lg p-6 space-y-4 shadow-sm";
+                
+                let memberListHtml = sub.members.map(m => `
+                    <div class="text-xs bg-gray-50 p-2 rounded border border-gray-100 flex items-center gap-3">
+                        <img src="${m.photo}" class="w-10 h-12 object-cover rounded bg-gray-200" onerror="this.src='https://placehold.co/40x50/f3f4f6/111111?text=Img'">
+                        <div>
+                            <p class="font-bold text-black">${m.stageName} (${m.realName})</p>
+                            <p class="text-gray-600">Position: ${m.position} | Born: ${m.birthday} (${m.nationality})</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-100 pb-3">
+                        <div>
+                            <h3 class="text-xl font-bold">${sub.name}</h3>
+                            <p class="text-xs text-gray-500">Agency: ${sub.agency || 'Independent'} | Debut: ${sub.debut || 'N/A'}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveSubmission(${idx})" class="bg-black text-white text-xs px-4 py-2 rounded hover:bg-gray-800 transition-colors">Approve & Publish</button>
+                            <button onclick="rejectSubmission(${idx})" class="border border-red-300 text-red-600 text-xs px-4 py-2 rounded hover:bg-red-50 transition-colors">Reject</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+                        ${memberListHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Approve Submission
+        function approveSubmission(index) {
+            const approvedGroup = pendingSubmissions.splice(index, 1)[0];
+            groups.push(approvedGroup);
+
+            localStorage.setItem('kpop_groups', JSON.stringify(groups));
+            localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+
+            activeGroupId = approvedGroup.id;
+            renderGroupTabs();
+            renderActiveGroup();
+            renderAdminDashboard();
+            updatePendingBadge();
+            alertCustom(`"${approvedGroup.name}" has been approved and published to the public database!`);
+        }
+
+        // Reject Submission
+        function rejectSubmission(index) {
+            pendingSubmissions.splice(index, 1);
+            localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            renderAdminDashboard();
+            updatePendingBadge();
+            alertCustom("Submission rejected.");
+        }
+
+        // Update Pending Badge Count
+        function updatePendingBadge() {
+            const badge = document.getElementById('pending-badge');
+            if (pendingSubmissions.length > 0) {
+                badge.innerText = pendingSubmissions.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Reset database to default seed state
+        function resetToDefaults() {
+            if (confirm("Are you sure you want to reset all groups back to default?")) {
+                groups = defaultGroups;
+                pendingSubmissions = [];
+                localStorage.setItem('kpop_groups', JSON.stringify(groups));
+                localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+                activeGroupId = groups[0].id;
+                renderGroupTabs();
+                renderActiveGroup();
+                renderAdminDashboard();
+                updatePendingBadge();
+                alertCustom("Database reset to defaults.");
+            }
+        }
+
+        // Custom Modal replacement for alert()
+        function alertCustom(message) {
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4";
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-sm w-full space-y-4 shadow-xl text-center">
+                    <p class="text-sm font-medium text-gray-800">${message}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full bg-black text-white text-xs py-2 rounded font-medium hover:bg-gray-800">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+    </script>
+
+</body>
+</html>
