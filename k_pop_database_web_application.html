@@ -80,15 +80,15 @@
                     <h3 class="font-semibold text-lg border-b border-gray-200 pb-2">Group Information</h3>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Group Name *</label>
-                        <input type="text" id="sub-group-name" required placeholder="e.g. V0LT5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="sub-group-name" required placeholder="e.g. V0LT5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black bg-white">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Agency / Company (Optional)</label>
-                        <input type="text" id="sub-group-agency" placeholder="e.g. Independent / Self-Produced" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="sub-group-agency" placeholder="e.g. Independent / Self-Produced" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black bg-white">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Debut Date</label>
-                        <input type="text" id="sub-group-debut" placeholder="e.g. June 15, 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="sub-group-debut" placeholder="e.g. June 15, 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black bg-white">
                     </div>
                 </div>
 
@@ -115,7 +115,7 @@
                     <h2 class="text-2xl font-bold">Admin Approval Dashboard</h2>
                     <p class="text-gray-600 text-sm mt-1">Review user submissions before publishing them to the public database.</p>
                 </div>
-                <button onclick="resetToDefaults()" class="text-xs border border-red-300 text-red-600 px-3 py-1.5 rounded hover:bg-red-50">Reset Database to Default</button>
+                <button onclick="resetToDefaults()" class="text-xs border border-red-300 text-red-600 px-3 py-1.5 rounded hover:bg-red-50">Reset Database</button>
             </div>
 
             <div id="admin-pending-list" class="space-y-4">
@@ -180,73 +180,68 @@
                         photo: "https://placehold.co/200x250/f3f4f6/111111?text=Taehyun"
                     }
                 ]
-            },
-            {
-                id: "straykids",
-                name: "Stray Kids",
-                agency: "JYP Entertainment",
-                debut: "March 25, 2018",
-                members: [
-                    {
-                        stageName: "Bang Chan (방찬)",
-                        realName: "Christopher Bang",
-                        position: "Leader, Producer, Lead Vocalist",
-                        birthday: "October 3, 1997",
-                        nationality: "Australian",
-                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Bang+Chan"
-                    },
-                    {
-                        stageName: "Hyunjin (현진)",
-                        realName: "Hwang Hyun-jin",
-                        position: "Main Dancer, Lead Rapper, Visual",
-                        birthday: "March 20, 2000",
-                        nationality: "Korean",
-                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Hyunjin"
-                    },
-                    {
-                        stageName: "Felix (필릭스)",
-                        realName: "Lee Felix / Lee Yong-bok",
-                        position: "Lead Dancer, Lead Rapper",
-                        birthday: "September 15, 2000",
-                        nationality: "Australian-Korean",
-                        photo: "https://placehold.co/200x250/f3f4f6/111111?text=Felix"
-                    }
-                ]
             }
         ];
 
-        let groups = JSON.parse(localStorage.getItem('kpop_groups')) || defaultGroups;
-        let pendingSubmissions = JSON.parse(localStorage.getItem('kpop_pending')) || [];
-        let activeGroupId = groups[0]?.id || 'v0lt5';
+        let groups = [];
+        let pendingSubmissions = [];
+        let activeGroupId = 'v0lt5';
         let searchQuery = '';
 
+        try {
+            const savedGroups = localStorage.getItem('kpop_groups');
+            groups = savedGroups ? JSON.parse(savedGroups) : defaultGroups;
+        } catch (e) {
+            groups = defaultGroups;
+        }
+
+        try {
+            const savedPending = localStorage.getItem('kpop_pending');
+            pendingSubmissions = savedPending ? JSON.parse(savedPending) : [];
+        } catch (e) {
+            pendingSubmissions = [];
+        }
+
+        if (groups.length > 0) {
+            activeGroupId = groups[0].id;
+        }
+
         window.onload = function() {
-            renderGroupTabs();
-            renderActiveGroup();
-            renderAdminDashboard();
-            updatePendingBadge();
-            addMemberField();
+            try {
+                renderGroupTabs();
+                renderActiveGroup();
+                renderAdminDashboard();
+                updatePendingBadge();
+                addMemberField();
+            } catch (err) {
+                console.error("Initialization error:", err);
+            }
         };
 
         function switchTab(tabName) {
-            document.getElementById('tab-home').classList.add('hidden');
-            document.getElementById('tab-submit').classList.add('hidden');
-            document.getElementById('tab-admin').classList.add('hidden');
+            try {
+                document.getElementById('tab-home').classList.add('hidden');
+                document.getElementById('tab-submit').classList.add('hidden');
+                document.getElementById('tab-admin').classList.add('hidden');
 
-            document.getElementById('nav-home').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black";
-            document.getElementById('nav-submit').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black";
-            document.getElementById('nav-admin').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black flex items-center gap-1";
+                document.getElementById('nav-home').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black";
+                document.getElementById('nav-submit').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black";
+                document.getElementById('nav-admin').className = "px-3 py-2 rounded-md transition-colors text-gray-600 hover:text-black flex items-center gap-1";
 
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
-            document.getElementById('nav-' + tabName).className = "px-3 py-2 rounded-md transition-colors bg-gray-100 text-black font-semibold flex items-center gap-1";
+                document.getElementById('tab-' + tabName).classList.remove('hidden');
+                document.getElementById('nav-' + tabName).className = "px-3 py-2 rounded-md transition-colors bg-gray-100 text-black font-semibold flex items-center gap-1";
 
-            if(tabName === 'admin') {
-                renderAdminDashboard();
+                if(tabName === 'admin') {
+                    renderAdminDashboard();
+                }
+            } catch (e) {
+                console.error("Tab switch error:", e);
             }
         }
 
         function renderGroupTabs() {
             const container = document.getElementById('group-tabs');
+            if (!container) return;
             container.innerHTML = '';
 
             groups.forEach(g => {
@@ -264,6 +259,7 @@
 
         function renderActiveGroup() {
             const container = document.getElementById('group-display-container');
+            if (!container) return;
             const group = groups.find(g => g.id === activeGroupId);
 
             if (!group) {
@@ -275,8 +271,8 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 sm:p-8">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-6">
                         <div>
-                            <h3 class="text-3xl font-black uppercase tracking-wide">${group.name} Profile</h3>
-                            <p class="text-sm text-gray-600 mt-1">Agency: <span class="font-medium text-black">${group.agency || 'Independent'}</span> | Debut: <span class="font-medium text-black">${group.debut || 'N/A'}</span></p>
+                            <h3 class="text-3xl font-black uppercase tracking-wide">${escapeHtml(group.name)} Profile</h3>
+                            <p class="text-sm text-gray-600 mt-1">Agency: <span class="font-medium text-black">${escapeHtml(group.agency || 'Independent')}</span> | Debut: <span class="font-medium text-black">${escapeHtml(group.debut || 'N/A')}</span></p>
                         </div>
                         <div class="text-xs bg-gray-200 text-gray-800 px-3 py-1 rounded font-medium">
                             ${group.members.length} Members
@@ -287,20 +283,23 @@
             `;
 
             group.members.forEach(m => {
-                if (searchQuery && !m.stageName.toLowerCase().includes(searchQuery) && !m.realName.toLowerCase().includes(searchQuery) && !group.name.toLowerCase().includes(searchQuery)) {
-                    return;
+                if (searchQuery) {
+                    const matchName = m.stageName.toLowerCase().includes(searchQuery);
+                    const matchReal = m.realName.toLowerCase().includes(searchQuery);
+                    const matchGroup = group.name.toLowerCase().includes(searchQuery);
+                    if (!matchName && !matchReal && !matchGroup) return;
                 }
 
                 html += `
                     <div class="profile-card bg-white rounded-lg p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">
-                        <img src="${m.photo || 'https://placehold.co/200x250/f3f4f6/111111?text=No+Photo'}" alt="${m.stageName}" class="w-36 h-44 object-cover rounded-md border border-gray-200 bg-gray-100 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f3f4f6/111111?text=Photo'">
+                        <img src="${escapeHtml(m.photo || 'https://placehold.co/200x250/f3f4f6/111111?text=No+Photo')}" alt="${escapeHtml(m.stageName)}" class="w-36 h-44 object-cover rounded-md border border-gray-200 bg-gray-100 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f3f4f6/111111?text=Photo'">
                         <div class="space-y-2 w-full">
-                            <h4 class="text-xl font-bold text-black border-b border-gray-100 pb-1">${m.stageName}</h4>
+                            <h4 class="text-xl font-bold text-black border-b border-gray-100 pb-1">${escapeHtml(m.stageName)}</h4>
                             <ul class="text-xs space-y-1.5 text-gray-700">
-                                <li><strong class="text-black">Real Name:</strong> ${m.realName}</li>
-                                <li><strong class="text-black">Position:</strong> ${m.position}</li>
-                                <li><strong class="text-black">Birthday:</strong> ${m.birthday}</li>
-                                <li><strong class="text-black">Nationality:</strong> ${m.nationality}</li>
+                                <li><strong class="text-black">Real Name:</strong> ${escapeHtml(m.realName)}</li>
+                                <li><strong class="text-black">Position:</strong> ${escapeHtml(m.position)}</li>
+                                <li><strong class="text-black">Birthday:</strong> ${escapeHtml(m.birthday)}</li>
+                                <li><strong class="text-black">Nationality:</strong> ${escapeHtml(m.nationality)}</li>
                             </ul>
                         </div>
                     </div>
@@ -316,12 +315,14 @@
         }
 
         function filterGroups() {
-            searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const input = document.getElementById('search-input');
+            searchQuery = input ? input.value.toLowerCase() : '';
             renderActiveGroup();
         }
 
         function addMemberField() {
             const container = document.getElementById('members-input-container');
+            if (!container) return;
             const index = container.children.length + 1;
 
             const div = document.createElement('div');
@@ -332,12 +333,12 @@
                     ${index > 1 ? '<button type="button" onclick="this.closest(\'.member-row\').remove()" class="text-xs text-red-600 hover:underline">Remove</button>' : ''}
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input type="text" placeholder="Stage Name (e.g. Haru)" class="member-stage px-3 py-1.5 border border-gray-300 rounded text-sm" required>
-                    <input type="text" placeholder="Real Name (e.g. Haru Lee)" class="member-real px-3 py-1.5 border border-gray-300 rounded text-sm" required>
-                    <input type="text" placeholder="Position (e.g. Main Dancer)" class="member-pos px-3 py-1.5 border border-gray-300 rounded text-sm" required>
-                    <input type="text" placeholder="Birthday (e.g. Jan 1, 2005)" class="member-bday px-3 py-1.5 border border-gray-300 rounded text-sm" required>
-                    <input type="text" placeholder="Nationality (e.g. Korean)" class="member-nat px-3 py-1.5 border border-gray-300 rounded text-sm" required>
-                    <input type="url" placeholder="Photo URL (optional)" class="member-photo px-3 py-1.5 border border-gray-300 rounded text-sm">
+                    <input type="text" placeholder="Stage Name (e.g. Haru)" class="member-stage px-3 py-1.5 border border-gray-300 rounded text-sm bg-white" required>
+                    <input type="text" placeholder="Real Name (e.g. Haru Lee)" class="member-real px-3 py-1.5 border border-gray-300 rounded text-sm bg-white" required>
+                    <input type="text" placeholder="Position (e.g. Main Dancer)" class="member-pos px-3 py-1.5 border border-gray-300 rounded text-sm bg-white" required>
+                    <input type="text" placeholder="Birthday (e.g. Jan 1, 2005)" class="member-bday px-3 py-1.5 border border-gray-300 rounded text-sm bg-white" required>
+                    <input type="text" placeholder="Nationality (e.g. Korean)" class="member-nat px-3 py-1.5 border border-gray-300 rounded text-sm bg-white" required>
+                    <input type="url" placeholder="Photo URL (optional)" class="member-photo px-3 py-1.5 border border-gray-300 rounded text-sm bg-white">
                 </div>
             `;
             container.appendChild(div);
@@ -346,21 +347,32 @@
         function handleGroupSubmission(e) {
             e.preventDefault();
 
-            const name = document.getElementById('sub-group-name').value.trim();
-            const agency = document.getElementById('sub-group-agency').value.trim();
-            const debut = document.getElementById('sub-group-debut').value.trim();
+            const nameEl = document.getElementById('sub-group-name');
+            const agencyEl = document.getElementById('sub-group-agency');
+            const debutEl = document.getElementById('sub-group-debut');
+
+            const name = nameEl ? nameEl.value.trim() : '';
+            const agency = agencyEl ? agencyEl.value.trim() : '';
+            const debut = debutEl ? debutEl.value.trim() : '';
 
             const memberRows = document.querySelectorAll('.member-row');
             const members = [];
 
             memberRows.forEach(row => {
+                const stage = row.querySelector('.member-stage')?.value.trim() || '';
+                const real = row.querySelector('.member-real')?.value.trim() || '';
+                const pos = row.querySelector('.member-pos')?.value.trim() || '';
+                const bday = row.querySelector('.member-bday')?.value.trim() || '';
+                const nat = row.querySelector('.member-nat')?.value.trim() || '';
+                const photo = row.querySelector('.member-photo')?.value.trim() || 'https://placehold.co/200x250/f3f4f6/111111?text=Member';
+
                 members.push({
-                    stageName: row.querySelector('.member-stage').value.trim(),
-                    realName: row.querySelector('.member-real').value.trim(),
-                    position: row.querySelector('.member-pos').value.trim(),
-                    birthday: row.querySelector('.member-bday').value.trim(),
-                    nationality: row.querySelector('.member-nat').value.trim(),
-                    photo: row.querySelector('.member-photo').value.trim() || 'https://placehold.co/200x250/f3f4f6/111111?text=Member'
+                    stageName: stage,
+                    realName: real,
+                    position: pos,
+                    birthday: bday,
+                    nationality: nat,
+                    photo: photo
                 });
             });
 
@@ -373,10 +385,15 @@
             };
 
             pendingSubmissions.push(newSubmission);
-            localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            try {
+                localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            } catch (err) {}
 
-            document.getElementById('submission-form').reset();
-            document.getElementById('members-input-container').innerHTML = '';
+            const form = document.getElementById('submission-form');
+            if (form) form.reset();
+            
+            const memberContainer = document.getElementById('members-input-container');
+            if (memberContainer) memberContainer.innerHTML = '';
             addMemberField();
 
             updatePendingBadge();
@@ -386,6 +403,7 @@
 
         function renderAdminDashboard() {
             const container = document.getElementById('admin-pending-list');
+            if (!container) return;
             
             if (pendingSubmissions.length === 0) {
                 container.innerHTML = '<div class="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center text-gray-500">No pending group submissions to review.</div>';
@@ -399,10 +417,10 @@
                 
                 let memberListHtml = sub.members.map(m => `
                     <div class="text-xs bg-gray-50 p-2 rounded border border-gray-100 flex items-center gap-3">
-                        <img src="${m.photo}" class="w-10 h-12 object-cover rounded bg-gray-200" onerror="this.src='https://placehold.co/40x50/f3f4f6/111111?text=Img'">
+                        <img src="${escapeHtml(m.photo)}" class="w-10 h-12 object-cover rounded bg-gray-200" onerror="this.src='https://placehold.co/40x50/f3f4f6/111111?text=Img'">
                         <div>
-                            <p class="font-bold text-black">${m.stageName} (${m.realName})</p>
-                            <p class="text-gray-600">Position: ${m.position} | Born: ${m.birthday} (${m.nationality})</p>
+                            <p class="font-bold text-black">${escapeHtml(m.stageName)} (${escapeHtml(m.realName)})</p>
+                            <p class="text-gray-600">Position: ${escapeHtml(m.position)} | Born: ${escapeHtml(m.birthday)} (${escapeHtml(m.nationality)})</p>
                         </div>
                     </div>
                 `).join('');
@@ -410,8 +428,8 @@
                 card.innerHTML = `
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-100 pb-3">
                         <div>
-                            <h3 class="text-xl font-bold">${sub.name}</h3>
-                            <p class="text-xs text-gray-500">Agency: ${sub.agency || 'Independent'} | Debut: ${sub.debut || 'N/A'}</p>
+                            <h3 class="text-xl font-bold">${escapeHtml(sub.name)}</h3>
+                            <p class="text-xs text-gray-500">Agency: ${escapeHtml(sub.agency || 'Independent')} | Debut: ${escapeHtml(sub.debut || 'N/A')}</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="approveSubmission(${idx})" class="bg-black text-white text-xs px-4 py-2 rounded hover:bg-gray-800 transition-colors">Approve & Publish</button>
@@ -430,8 +448,10 @@
             const approvedGroup = pendingSubmissions.splice(index, 1)[0];
             groups.push(approvedGroup);
 
-            localStorage.setItem('kpop_groups', JSON.stringify(groups));
-            localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            try {
+                localStorage.setItem('kpop_groups', JSON.stringify(groups));
+                localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            } catch (e) {}
 
             activeGroupId = approvedGroup.id;
             renderGroupTabs();
@@ -443,7 +463,9 @@
 
         function rejectSubmission(index) {
             pendingSubmissions.splice(index, 1);
-            localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            try {
+                localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+            } catch (e) {}
             renderAdminDashboard();
             updatePendingBadge();
             alertCustom("Submission rejected.");
@@ -451,6 +473,7 @@
 
         function updatePendingBadge() {
             const badge = document.getElementById('pending-badge');
+            if (!badge) return;
             if (pendingSubmissions.length > 0) {
                 badge.innerText = pendingSubmissions.length;
                 badge.classList.remove('hidden');
@@ -460,11 +483,13 @@
         }
 
         function resetToDefaults() {
-            if (confirm("Are you sure you want to reset all groups back to default?")) {
+            if (window.confirm("Are you sure you want to reset all groups back to default?")) {
                 groups = defaultGroups;
                 pendingSubmissions = [];
-                localStorage.setItem('kpop_groups', JSON.stringify(groups));
-                localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+                try {
+                    localStorage.setItem('kpop_groups', JSON.stringify(groups));
+                    localStorage.setItem('kpop_pending', JSON.stringify(pendingSubmissions));
+                } catch (e) {}
                 activeGroupId = groups[0].id;
                 renderGroupTabs();
                 renderActiveGroup();
@@ -479,11 +504,20 @@
             modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4";
             modal.innerHTML = `
                 <div class="bg-white rounded-lg p-6 max-w-sm w-full space-y-4 shadow-xl text-center">
-                    <p class="text-sm font-medium text-gray-800">${message}</p>
+                    <p class="text-sm font-medium text-gray-800">${escapeHtml(message)}</p>
                     <button onclick="this.closest('.fixed').remove()" class="w-full bg-black text-white text-xs py-2 rounded font-medium hover:bg-gray-800">OK</button>
                 </div>
             `;
             document.body.appendChild(modal);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, "&amp;")
+                       .replace(/</g, "&lt;")
+                       .replace(/>/g, "&gt;")
+                       .replace(/"/g, "&quot;")
+                       .replace(/'/g, "&#039;");
         }
     </script>
 
